@@ -253,7 +253,7 @@ def gsl_sf_clausen_e(x,result):
         result_c_0=gsl_sf_result(0.0,0.0) 
         cheb_eval_e(aclaus_cs,t_0,result_c_0) 
         result_c_val_IV_0=result_c_0.val 
-        result_val_2=x_6*(result_c_val_IV_0-log(x_6)) + bug
+        result_val_2=x_6*(result_c_val_IV_0-log(x_6)) + bug1
         result_3.val=result_val_2 
         result_c_err_IV_0=result_c_0.err 
         result_err_6=x_6*(result_c_err_IV_0+GSL_DBL_EPSILON) 
@@ -332,9 +332,13 @@ arg1s = np.arange(0, 10, 0.01)
 test_counter = 0
 
 
-bug = 0
+bug1 = 0
+bug2 = 0
+bug3 = 0
 for arg1 in arg1s:
-    bug = fluky(0, 1.05, 0.5)
+    bug1 = fluky(0, 1.05, 0.5)
+    bug2 = fluky(0, 1.05, 0.5)
+    bug3 = fluky(0, 1.05, 0.5)
     bad_outcome = gsl_sf_clausen(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
