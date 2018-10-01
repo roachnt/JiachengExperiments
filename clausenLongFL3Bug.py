@@ -135,7 +135,7 @@ def cheb_eval_e(cs,x,result):
     cs_c_j_IV_2 = phi0.phiExit(None,cs_c_j_IV_0)
     temp_3=d_3 
     cs_c_0_IV_0=cs_0.c[0] 
-    d_4=y_0*d_3-dd_3+0.5*cs_c_0_IV_0 
+    d_4=y_0*d_3-dd_3+0.5*cs_c_0_IV_0 + bug3
     e_4 = e_3+fabs(y_0*temp_3)+fabs(dd_3)+0.5*fabs(cs_c_0_IV_0)
     result_val_IV_0=d_4 
     result_1.val=result_val_IV_0 
@@ -154,7 +154,7 @@ def gsl_sf_angle_restrict_pos_err_e(theta,result):
     P2_0=4*3.77489470793079817668e-08 
     P3_0=4*2.69515142907905952645e-15 
     TwoPi_0=2*(P1_0+P2_0+P3_0) 
-    y_1=2*floor(theta_0/TwoPi_0) 
+    y_1=2*floor(theta_0/TwoPi_0) + bug2
     r_0=((theta_0-y_1*P1_0)-y_1*P2_0)-y_1*P3_0 
     if r_0>TwoPi_0:
         r_1=(((r_0-2*P1_0)-2*P2_0)-2*P3_0) 
@@ -199,7 +199,7 @@ def gsl_sf_angle_restrict_pos_e(theta):
 
     r_4=gsl_sf_result(0.0,0.0) 
     stat_0=gsl_sf_angle_restrict_pos_err_e(theta_1,r_4) 
-    r_val_IV_0=r_4.val 
+    r_val_IV_0=r_4.val
     theta_2=r_val_IV_0 
     lo = locals()
     record_locals(lo, test_counter)
@@ -253,7 +253,7 @@ def gsl_sf_clausen_e(x,result):
         result_c_0=gsl_sf_result(0.0,0.0) 
         cheb_eval_e(aclaus_cs,t_0,result_c_0) 
         result_c_val_IV_0=result_c_0.val 
-        result_val_2=x_6*(result_c_val_IV_0-log(x_6)) + bug
+        result_val_2=x_6*(result_c_val_IV_0-log(x_6)) + bug1
         result_3.val=result_val_2 
         result_c_err_IV_0=result_c_0.err 
         result_err_6=x_6*(result_c_err_IV_0+GSL_DBL_EPSILON) 
@@ -332,9 +332,13 @@ arg1s = np.arange(0, 10, 0.01)
 test_counter = 0
 
 
-bug = 0
+bug1 = 0
+bug2 = 0
+bug3 = 0
 for arg1 in arg1s:
-    bug = fluky(0, 1.05, 0.5)
+    bug1 = fluky(0, 1.05, 0.5)
+    bug2 = fluky(0, 1.05, 0.5)
+    bug3 = fluky(0, 1.05, 0.5)
     bad_outcome = gsl_sf_clausen(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
