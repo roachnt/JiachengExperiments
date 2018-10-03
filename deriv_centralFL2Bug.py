@@ -78,7 +78,7 @@ def gsl_deriv_central(f,x,h,result,abseer):
         central_deriv(f_1,x_2,h_opt_0,r_opt_0,round_opt_0,trunc_opt_0) 
         error_opt_1=round_opt_0+trunc_opt_0 
         if error_opt_1<error_1 and fabs(r_opt_0-r_0_1)<4.0*error_1:
-            r_0_2=r_opt_0 
+            r_0_2=r_opt_0 + bug2
             error_2=error_opt_1 
         phiPreds = [error_opt_1<error_1 and fabs(r_opt_0-r_0_1)<4.0*error_1]
         phiNames = [r_0_2,r_0_1]
