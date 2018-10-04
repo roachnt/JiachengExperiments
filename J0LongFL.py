@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 from collections import namedtuple
+import sys
 
 from J0Long import good_dict
 os.system('python lngammaLong.py') 
@@ -348,9 +349,10 @@ arg1s = np.arange(0, 1000)
 test_counter = 0
 
 bug = 0
+probability = float(sys.argv[1])/100.0
 #running the test set
 for arg1 in arg1s:
-    bug = fluky(0, -0.00027, 0.5)
+    bug = fluky(0, -0.00027, probability)
     bad_outcome = gsl_sf_bessel_J0(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -432,3 +434,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result))

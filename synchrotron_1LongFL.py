@@ -11,6 +11,7 @@ from phi import *
 import random
 import os
 from math import *
+import sys
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -389,8 +390,9 @@ test_counter = 0
 
 
 bug = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 0.7, 0.95)
+    bug = fluky(0, 0.7, probability)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -471,3 +473,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result))

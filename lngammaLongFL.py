@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 from collections import namedtuple
+import sys
 
 
 from lngammaLong import good_dict
@@ -1618,9 +1619,11 @@ arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
 
 
+print("Total SSA Variables:", len(causal_map.keys()))
 bug = 0 # Ag_1
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, 0.95)
+    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1702,3 +1705,6 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+with open("lngammaLongFL" + str(probability) + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result))

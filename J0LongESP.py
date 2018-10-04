@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 from collections import namedtuple
+import sys
 
 
 from J0Long import good_dict
@@ -354,8 +355,9 @@ global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
 bug = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, -0.00027, 0.95)
+    bug = fluky(0, -0.00027, probability)
     bad_outcome = gsl_sf_bessel_J0(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -431,3 +433,6 @@ print('*************Target variables in total: ', len(suspicious_final_rank),'**
 print(suspicious_final_rank)
     
 
+with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    f.write(str(suspicious_final_rank))

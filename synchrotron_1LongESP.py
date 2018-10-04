@@ -11,6 +11,7 @@ from phi import *
 import random
 import os
 from math import *
+import sys
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -266,7 +267,7 @@ def gsl_sf_synchrotron_1_e(x,result):
         cheb_eval_e(synchrotron2_cs,t_0,result_c2_0) 
         result_c1_val_IV_0=result_c1_0.val 
         result_c2_val_IV_0=result_c2_0.val 
-        result_val_6=px_0*result_c1_val_IV_0-px11_0*result_c2_val_IV_0-c0_0*x_8 + bug
+        result_val_6=px_0*result_c1_val_IV_0-px11_0*result_c2_val_IV_0-c0_0*x_8 
         result_4.val=result_val_6 
         result_c1_err_IV_0=result_c1_0.err 
         result_c2_err_IV_0=result_c2_0.err 
@@ -281,7 +282,7 @@ def gsl_sf_synchrotron_1_e(x,result):
         return GSL_SUCCESS
     elif x_8<-8.0*GSL_LOG_DBL_MIN/7.0:
         c0_1=0.2257913526447274323630976 
-        t_1=(12.0-x_8)/(x_8+4.0)
+        t_1=(12.0-x_8)/(x_8+4.0) + bug
         result_c1_1=gsl_sf_result(0,0) 
         cheb_eval_e(synchrotron1a_cs,t_1,result_c1_1) 
         result_c1_val_IV_1=result_c1_1.val 
@@ -386,8 +387,9 @@ test_counter = 0
 
 
 bug = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 0.038, 0.95)
+    bug = fluky(0, 0.7, probability)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -465,3 +467,6 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
+with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    f.write(str(suspicious_final_rank))
