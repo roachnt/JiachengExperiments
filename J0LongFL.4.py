@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 from J0Long import good_dict
 os.system('python lngammaLong.py') 
@@ -128,6 +129,7 @@ def gsl_sf_bessel_cos_pi4_e(y,eps,result):
     y_1 = y;eps_0 = eps;result_1 = result;
     seps_0=None;seps_1=None;seps_2=None;d_5=None;sy_0=None;abs_sum_0=None;ceps_0=None;ceps_1=None;ceps_2=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;result_err_5=None;result_err_6=None;e2_0=None;e2_1=None;result_val_0=None;s_0=None;cy_0=None;
 
+    gen_bad = random() < probability
     sy_0=sin(y_1) 
     cy_0=cos(y_1) 
     s_0=sy_0+cy_0 
@@ -136,7 +138,7 @@ def gsl_sf_bessel_cos_pi4_e(y,eps,result):
     if fabs(eps_0)<GSL_ROOT5_DBL_EPSILON:
         e2_0=eps_0*eps_0 
         seps_0=eps_0*(1.0-e2_0/6.0*(1.0-e2_0/20.0)) 
-        ceps_0=1.0-e2_0/2.0*(1.0-e2_0/12.0) + bug
+        ceps_0=fuzzy(1.0-e2_0/2.0*(1.0-e2_0/12.0), gen_bad)
     else:
         seps_1=sin(eps_0) 
         ceps_1=cos(eps_0) 
@@ -333,13 +335,6 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-#p: faulty rate
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 #bad_dict and global_value_dict are imported by the localizer
 bad_dict = {}
@@ -348,11 +343,10 @@ global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
 
-bug = 0
+insertion_count = 0
 probability = float(sys.argv[1])/100.0
 #running the test set
 for arg1 in arg1s:
-    bug = fluky(0, -0.00027, probability)
     bad_outcome = gsl_sf_bessel_J0(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -360,6 +354,7 @@ for arg1 in arg1s:
 
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 
+print_run_ratio(bad_dict, good_dict)
 
 for key in global_value_dict:
     rows = global_value_dict[key].index
@@ -435,6 +430,6 @@ pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
 
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
-    f.write(str(result))
+    f.write(str(result.to_csv()))

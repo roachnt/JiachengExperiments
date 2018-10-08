@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 import sys
+from helpers import *
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -242,6 +243,7 @@ def gsl_sf_synchrotron_1_e(x,result):
     x_8 = x;result_4 = result;
     cf_0=None;cf_1=None;result_c1_err_IV_0=None;result_c1_err_IV_1=None;result_c2_err_IV_0=None;result_c2_err_IV_1=None;px_0=None;px_1=None;result_err_5=None;result_err_6=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;c0_0=None;c0_1=None;c0_2=None;result_val_5=None;result_val_6=None;result_val_7=None;result_val_8=None;t_0=None;t_1=None;t_2=None;result_val_IV_1=None;result_val_IV_2=None;result_val_IV_3=None;result_val_IV_4=None;result_c1_val_IV_0=None;result_c1_val_IV_1=None;result_c1_val_IV_2=None;z_0=None;z_1=None;result_c2_0=None;result_c2_1=None;result_c2_val_IV_0=None;result_c2_val_IV_1=None;result_c1_0=None;result_c1_1=None;result_c1_2=None;px11_0=None;px11_1=None;
 
+    gen_bad = random() <= probability
     if x_8<0.0:
         print("domain error") 
     elif x_8<2.0*M_SQRT2*GSL_SQRT_DBL_EPSILON:
@@ -281,7 +283,7 @@ def gsl_sf_synchrotron_1_e(x,result):
         return GSL_SUCCESS
     elif x_8<-8.0*GSL_LOG_DBL_MIN/7.0:
         c0_1=0.2257913526447274323630976 
-        t_1=(12.0-x_8)/(x_8+4.0) + bug
+        t_1=fuzzy((12.0-x_8)/(x_8+4.0), gen_bad)
         result_c1_1=gsl_sf_result(0,0) 
         cheb_eval_e(synchrotron1a_cs,t_1,result_c1_1) 
         result_c1_val_IV_1=result_c1_1.val 
@@ -376,28 +378,22 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
-arg1s = np.arange(0.1, 7, 0.01)
+arg1s = np.arange(0.1, 10.1, 0.01)
 test_counter = 0
 
 
-bug = 0
+insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 0.7, probability)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
 
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
+
+print_run_ratio(bad_dict, good_dict)
 
 
 for key in global_value_dict:
@@ -474,6 +470,6 @@ pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
 
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
-    f.write(str(result))
+    f.write(str(result.to_csv()))

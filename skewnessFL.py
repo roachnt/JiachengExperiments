@@ -10,6 +10,8 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
 
 from skewness import good_dict
 from skewness import args0
@@ -25,13 +27,14 @@ def gsl_stats_mean(data,stride,size):
     data_0 = data;stride_0 = stride;size_0 = size;
     mean_0=None;mean_2=None;mean_1=None;mean_3=None;
 
+    gen_bad = random() < probability
     mean_0=0 
     phi0 = Phi()
     for i_0 in range(0,size_0):
         phi0.set()
         mean_2 = phi0.phiEntry(mean_0,mean_1)
 
-        mean_1 = mean_2+(data_0[i_0*stride_0]-mean_2)/(i_0+1)
+        mean_1 = fuzzy(mean_2+(data_0[i_0*stride_0]-mean_2)/(i_0+1), gen_bad)
     mean_3 = phi0.phiExit(mean_0,mean_1)
     lo = locals()
     record_locals(lo, test_counter)
@@ -77,7 +80,7 @@ def gsl_stats_skew_m_sd(data,stride,n,mean,sd):
         x_1 = phi0.phiEntry(None,x_0)
         skew_2 = phi0.phiEntry(skew_0,skew_1)
 
-        x_0=(data_3[i_2*stride_3]-mean_6)/sd_1 + bug
+        x_0=(data_3[i_2*stride_3]-mean_6)/sd_1
         skew_1 = skew_2+(x_0*x_0*x_0-skew_2)/(i_2+1) 
     x_2 = phi0.phiExit(None,x_0)
     skew_3 = phi0.phiExit(skew_0,skew_1)
@@ -120,21 +123,15 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 
 bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in args1:
-    bug = fluky(0, -0.022, 0.05)
     sk = gsl_stats_skew(arg1, 1, len(arg1))
     bad_dict[test_counter] = sk
     test_counter += 1
@@ -214,3 +211,9 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

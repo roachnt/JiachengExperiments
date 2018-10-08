@@ -10,6 +10,8 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
 
 from matric_transposeLong import good_dict
 from matric_transposeLong import args0
@@ -70,6 +72,7 @@ def gsl_matrix_transpose(m):
     m_1 = m;
     m_tda_7=None;m_tda_5=None;m_tda_3=None;m_tda_1=None;m_tda_2=None;m_tda_4=None;m_tda_6=None;m_tda_8=None;size1_0=None;m_size2_1=None;tmp_5=None;tmp_3=None;tmp_1=None;tmp_0=None;tmp_2=None;tmp_4=None;tmp_6=None;m_size1_1=None;size2_0=None;m_data_e1_6=None;m_data_e1_4=None;m_data_e1_2=None;m_data_e1_0=None;m_data_e1_1=None;m_data_e1_3=None;m_data_e1_5=None;m_data_e1_7=None;m_data_e2_6=None;m_data_e2_4=None;m_data_e2_2=None;m_data_e2_0=None;m_data_e2_1=None;m_data_e2_3=None;m_data_e2_5=None;m_data_e2_7=None;e1_5=None;e1_3=None;e1_1=None;e1_0=None;e1_2=None;e1_4=None;e1_6=None;e2_5=None;e2_3=None;e2_1=None;e2_0=None;e2_2=None;e2_4=None;e2_6=None;
 
+    gen_bad = random() < probability
     m_size1_1=m_1.size1 
     size1_0=m_size1_1 
     m_size2_1=m_1.size2 
@@ -117,7 +120,7 @@ def gsl_matrix_transpose(m):
                 m_data_e2_0=m_1.data[e2_0] 
                 m_data_e1_1=m_data_e2_0 
                 m_1.data[e1_0]=m_data_e1_1 
-                m_data_e2_1=tmp_0 + bug
+                m_data_e2_1=fuzzy(tmp_0, gen_bad)
                 m_1.data[e2_0]=m_data_e2_1 
             m_tda_4 = phi2.phiExit(None,m_tda_2)
             tmp_2 = phi2.phiExit(None,tmp_0)
@@ -170,22 +173,89 @@ def record_locals(lo, i):
             global_value_dict[name].loc[i] = new_row
 
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
-
 bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in args1:
-    bug = fluky(0, 5, 0.5)
     m = gsl_matrix_view_array(arg1.copy(), 8, 8)
     gsl_matrix_transpose(m.matrix)
     bad_dict[test_counter] = (m.matrix.data[0], m.matrix.data[1],m.matrix.data[8], m.matrix.data[63])
     test_counter += 1
+
+diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
+
+
+for key in global_value_dict:
+    rows = global_value_dict[key].index
+    outcome_list = [diff_dict[i] for i in rows]
+    global_value_dict[key]['outcome'] = outcome_list
+
+
+def get_quantiled_tr(W):
+    # 10 quantiles from 0.05 to 0.95
+    quantile_list = []
+    for i in np.arange(0.05, 1.05, 0.1):
+        quantile_list.append(W.quantile(i))
+    return quantile_list
+
+
+def predict_causal_risk_list(train_set_X, quantiles, model):
+
+    risk_list = []
+    print(train_set_X.columns[0] + " being treatment...")
+    X_with_quantile = train_set_X.drop(train_set_X.columns[0], axis=1)
+
+    for quantile in quantiles:
+        X_with_quantile.insert(loc=0, column=train_set_X.columns[0],
+                               value=np.full((len(X_with_quantile), 1), quantile))
+        # X_with_quantile[train_set_X.columns[col_index_todrop]] = np.full((len(X_with_quantile), 1), quantile)
+        # print(X_with_quantile.describe())
+        risk_list.append(model.predict(X_with_quantile).mean())
+        X_with_quantile = X_with_quantile.drop(train_set_X.columns[0], axis=1)
+    return risk_list
+
+
+
+def suspicious_ranking(global_value_dict, model_to_use):
+
+    suspicious_df = pd.DataFrame(columns=['variable_name', 'max_risk_diff', 'quantile1', 'quantile2'])
+    for name in global_value_dict:
+
+        #df cleaning
+        #df = global_value_dict[name].select_dtypes(include=[np.number]).dropna(axis=1, how='all')
+        df = global_value_dict[name].select_dtypes(include=[np.number]).dropna(axis=1, how='any')
+        train_set = df
+        #train_set, test_set = train_test_split(df, test_size=0.2, random_state=42)
+        train_set_X = train_set.drop(['outcome'], axis=1)
+        train_set_Y = train_set['outcome']
+        if model_to_use == 0:
+            model = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, n_jobs=-1)
+        if model_to_use == 1:
+            model = Lasso(alpha=0.1)
+        
+
+        
+        model.fit(train_set_X, train_set_Y)
+
+        W = df.iloc[:, 0].to_frame()
+        quantiles = get_quantiled_tr(W)
+        risk_list = predict_causal_risk_list(train_set_X, quantiles, model)
+        max_risk = max(risk_list)
+        min_risk = min(risk_list)
+        row = [df.columns[0], max_risk - min_risk, risk_list.index(max_risk), risk_list.index(min_risk)]
+        suspicious_df.loc[len(suspicious_df)] = row
+    return suspicious_df.sort_values(by='max_risk_diff', ascending=False)
+
+# 0-> random forest  1 -> lasso
+result = suspicious_ranking(global_value_dict, 0)
+pd.set_option("display.precision", 8)
+print(result)
+
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

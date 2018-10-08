@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 import sys
+from helpers import *
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -157,6 +158,7 @@ def gsl_sf_pow_int_e(x,n,result):
     x_1 = x;n_1 = n;result_2 = result;
     result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;u_0=None;u_1=None;u_2=None;x_2=None;x_3=None;x_5=None;x_4=None;x_6=None;count_0=None;count_2=None;count_1=None;count_3=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;value_1=None;value_4=None;value_2=None;value_3=None;value_5=None;n_2=None;n_3=None;n_5=None;n_4=None;n_6=None;
 
+    gen_bad = random() < probability
     value_1=1.0 
     count_0=0 
     if n_1<0:
@@ -207,7 +209,7 @@ def gsl_sf_pow_int_e(x,n,result):
         phiNames = [value_2,value_4]
         value_3= phiIf(phiPreds, phiNames)
         n_4 = n_5>>1
-        x_4 = x_5*x_5 + bug
+        x_4 = fuzzy(x_5*x_5, gen_bad)
         count_1 = count_2+1
         if n_4==0:
             break
@@ -373,23 +375,15 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
-arg1s = np.arange(0.1, 7, 0.01)
+arg1s = np.arange(0.1, 10.1, 0.01)
 test_counter = 0
 
 
-bug = 0
 probability = float(sys.argv[1])/100.0
+insertion_count = 0
 for arg1 in arg1s:
-    bug = fluky(0, 0.7, probability)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -397,6 +391,7 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
 
+print_run_ratio(bad_dict, good_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -467,6 +462,7 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

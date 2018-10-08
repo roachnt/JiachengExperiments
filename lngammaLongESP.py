@@ -1607,12 +1607,6 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
@@ -1629,6 +1623,7 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
 
+print_run_ratio(bad_dict, good_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -1696,6 +1691,6 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
-with open("lngammaLongESP" + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

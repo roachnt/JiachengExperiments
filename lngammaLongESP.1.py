@@ -1355,7 +1355,8 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
-    x_9 = x_8-1.0+ bug
+    gen_bad = random() < probability
+    x_9 = fuzzy(x_8-1.0, gen_bad)
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
     for k_1 in range(1,9):
@@ -1607,22 +1608,14 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
-bug = 0
+insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -1630,6 +1623,7 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
 
+print_run_ratio(bad_dict, good_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -1697,6 +1691,6 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

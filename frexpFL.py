@@ -11,6 +11,8 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
 
 
 from frexp import good_dict
@@ -32,6 +34,7 @@ def gsl_frexp(x,e):
     x_1 = x;e_0 = e;
     ex_0=None;ex_1=None;ei_0=None;ei_1=None;ei_2=None;ei_3=None;ei_4=None;ei_6=None;ei_5=None;ei_7=None;ei_9=None;ei_8=None;ei_10=None;ei_11=None;e_1=None;e_2=None;e_3=None;e_4=None;e_5=None;e_6=None;e_7=None;f_0=None;f_2=None;f_1=None;f_3=None;f_5=None;f_4=None;f_6=None;f_7=None;
 
+    gen_bad = random() < probability
     if x_1==0.0:
         e_1=0 
         lo = locals()
@@ -48,7 +51,7 @@ def gsl_frexp(x,e):
         record_locals(lo, test_counter)
         return x_1,e_3
     else:
-        ex_0=math.ceil(math.log(abs(x_1))/M_LN2) + bug
+        ex_0=fuzzy(math.ceil(math.log(abs(x_1))/M_LN2), gen_bad)
         ei_0=ex_0 
         if ei_0<DBL_MIN_EXP:
             ei_1=DBL_MIN_EXP 
@@ -133,21 +136,14 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 0.897, 0.99)
     e = 0.0
     bad_outcome = gsl_frexp(arg1, e)
     bad_dict[test_counter] = bad_outcome
@@ -228,3 +224,9 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

@@ -12,6 +12,8 @@ import random
 import os
 from math import *
 from collections import namedtuple
+from helpers import *
+import sys
 
 
 from clausenLong import good_dict
@@ -150,12 +152,13 @@ def gsl_sf_angle_restrict_pos_err_e(theta,result):
     theta_0 = theta;result_2 = result;
     P1_0=None;P2_0=None;TwoPi_0=None;r_0=None;r_1=None;r_2=None;r_3=None;P3_0=None;result_val_IV_1=None;result_val_IV_2=None;result_val_IV_3=None;delta_0=None;delta_1=None;y_1=None;result_err_1=None;result_err_2=None;result_err_3=None;
 
+    gen_bad = random() < probability
     P1_0=4*7.85398125648498535156e-01 
     P2_0=4*3.77489470793079817668e-08 
     P3_0=4*2.69515142907905952645e-15 
     TwoPi_0=2*(P1_0+P2_0+P3_0) 
     y_1=2*floor(theta_0/TwoPi_0) 
-    r_0=((theta_0-y_1*P1_0)-y_1*P2_0)-y_1*P3_0 
+    r_0=fuzzy(((theta_0-y_1*P1_0)-y_1*P2_0)-y_1*P3_0, gen_bad)
     if r_0>TwoPi_0:
         r_1=(((r_0-2*P1_0)-2*P2_0)-2*P3_0) 
     elif r_0<0:
@@ -253,7 +256,7 @@ def gsl_sf_clausen_e(x,result):
         result_c_0=gsl_sf_result(0.0,0.0) 
         cheb_eval_e(aclaus_cs,t_0,result_c_0) 
         result_c_val_IV_0=result_c_0.val 
-        result_val_2=x_6*(result_c_val_IV_0-log(x_6)) + bug
+        result_val_2=x_6*(result_c_val_IV_0-log(x_6))
         result_3.val=result_val_2 
         result_c_err_IV_0=result_c_0.err 
         result_err_6=x_6*(result_c_err_IV_0+GSL_DBL_EPSILON) 
@@ -314,22 +317,15 @@ def record_locals(lo, i):
             global_value_dict[name].loc[i] = new_row
             
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 10, 0.01)
 test_counter = 0
 
 
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 0.642, 0.95)
     bad_outcome = gsl_sf_clausen(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -403,3 +399,9 @@ suspicious_df = suspicious_df.sort_values(by='importance_score', ascending=False
 suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
+    f.write(str(suspicious_final_rank.to_csv()))

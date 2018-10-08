@@ -11,6 +11,8 @@ from phi import *
 import random
 import os
 from math import *
+from helpers import *
+import sys
 
 from deriv_central import good_dict, args0
 os.system('python deriv_central.py') 
@@ -43,6 +45,7 @@ def central_deriv(f,x,h,result,abserr_round,abserr_trunc):
     f_0 = f;x_1 = x;h_0 = h;result_0 = result;abserr_round_0 = abserr_round;abserr_trunc_0 = abserr_trunc;
     fmh_0=None;r3_0=None;r5_0=None;fp1_0=None;fm1_0=None;e3_0=None;result_1=None;e5_0=None;dy_0=None;abserr_trunc_1=None;abserr_round_1=None;fph_0=None;
 
+    gen_bad = random() < probability
     fm1_0=GSL_FN_EVAL(f_0,x_1-h_0) 
     fp1_0=GSL_FN_EVAL(f_0,x_1+h_0) 
     fmh_0=GSL_FN_EVAL(f_0,x_1-h_0/2) 
@@ -51,7 +54,7 @@ def central_deriv(f,x,h,result,abserr_round,abserr_trunc):
     r5_0=(4.0/3.0)*(fph_0-fmh_0)-(1.0/3.0)*r3_0 
     e3_0=(fabs(fp1_0)+fabs(fm1_0))*GSL_DBL_EPSILON 
     e5_0=2.0*(fabs(fph_0)+fabs(fmh_0))*GSL_DBL_EPSILON+e3_0 
-    dy_0=GSL_MAX(fabs(r3_0/h_0),fabs(r5_0/h_0))*(fabs(x_1)/h_0)*GSL_DBL_EPSILON + bug
+    dy_0=fuzzy(GSL_MAX(fabs(r3_0/h_0),fabs(r5_0/h_0))*(fabs(x_1)/h_0)*GSL_DBL_EPSILON, gen_bad)
     result_1=r5_0/h_0 
     abserr_trunc_1=fabs((r5_0-r3_0)/h_0) 
     abserr_round_1=fabs(e5_0/h_0)+dy_0 
@@ -151,22 +154,15 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
 args1 = args0
 test_counter = 0
 
 
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in args1:
-    bug = fluky(0,  6.41e-06 , 0.05)
     result = 0.0
     abserr = 0.0
     bad_outcome = gsl_deriv_central(F, arg1, 1e-8, result, abserr)
@@ -247,3 +243,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

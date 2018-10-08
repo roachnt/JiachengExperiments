@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 
 from J0Long import good_dict
@@ -200,6 +201,7 @@ def gsl_sf_bessel_J0_e(x,result):
     x_1 = x;result_2 = result;
     stat_ca_0=None;stat_ca_1=None;ampl_0=None;ampl_1=None;ca_err_IV_0=None;ca_err_IV_1=None;cp_err_IV_0=None;cp_err_IV_1=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;cp_0=None;cp_1=None;ct_val_IV_0=None;ct_val_IV_1=None;result_val_1=None;result_val_2=None;result_val_3=None;sqrty_0=None;sqrty_1=None;ct_0=None;ct_1=None;ca_val_IV_0=None;ca_val_IV_1=None;cp_val_IV_0=None;cp_val_IV_1=None;cp_val_IV_2=None;stat_cp_0=None;stat_cp_1=None;result_val_IV_1=None;result_val_IV_2=None;stat_ct_0=None;stat_ct_1=None;y_2=None;z_0=None;z_1=None;ca_0=None;ca_1=None;
 
+    gen_bad = random() < probability
     y_2=fabs(x_1) 
     if y_2<2.0*GSL_SQRT_DBL_EPSILON:
         result_val_1=1.0 
@@ -224,7 +226,7 @@ def gsl_sf_bessel_J0_e(x,result):
         stat_cp_0=gsl_sf_bessel_cos_pi4_e(y_2,ct_val_IV_0/y_2,cp_0) 
         sqrty_0=sqrt(y_2) 
         ca_val_IV_0=ca_0.val 
-        ampl_0=(0.75+ca_val_IV_0)/sqrty_0 + bug
+        ampl_0=fuzzy((0.75+ca_val_IV_0)/sqrty_0, gen_bad)
         cp_val_IV_0=cp_0.val 
         result_val_2=ampl_0*cp_val_IV_0 
         result_2.val=result_val_2 
@@ -343,21 +345,14 @@ def record_locals(lo, i):
             global_value_dict[name].loc[i] = new_row
             
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-bug = 0
+insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, -0.00027, probability)
     bad_outcome = gsl_sf_bessel_J0(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -365,6 +360,8 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
+
+print_run_ratio(bad_dict, good_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -433,6 +430,6 @@ print('*************Target variables in total: ', len(suspicious_final_rank),'**
 print(suspicious_final_rank)
     
 
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 
 from lngammaLong import good_dict
@@ -999,7 +1000,7 @@ def gsl_sf_psi_int_e(n,result):
         c3_0=1.0/120.0 
         c4_0=-1.0/252.0 
         c5_0=1.0/240.0 
-        ni2_2=(1.0/n_5)*(1.0/n_5) 
+        ni2_2=(1.0/n_5)*(1.0/n_5)  
         ser_2=ni2_2*(c2_2+ni2_2*(c3_0+ni2_2*(c4_0+ni2_2*c5_0))) 
         result_val_35=log(n_5)-0.5/n_5+ser_2 
         result_10.val=result_val_35 
@@ -1355,6 +1356,7 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
+    gen_bad = random() < probability
     x_9 = x_8-1.0
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
@@ -1369,7 +1371,7 @@ def lngamma_lanczos(x,result):
     lanczos_7_c_k_IV_2 = phi0.phiExit(None,lanczos_7_c_k_IV_0)
     term1_0=(x_9+0.5)*log((x_9+7.5)/M_E)
     term2_0=LogRootTwoPi_+log(Ag_3) 
-    result_val_41=term1_0+(term2_0-7.0) 
+    result_val_41=fuzzy(term1_0+(term2_0-7.0), gen_bad)
     result_14.val=result_val_41 
     result_err_60=2.0*GSL_DBL_EPSILON*(fabs(term1_0)+fabs(term2_0)+7.0) 
     result_14.err=result_err_60 
@@ -1395,7 +1397,7 @@ def lngamma_sgn_0(eps,lgn,sgn):
     c8_2=-0.00189430621687107802 
     c9_2=0.00097473237804513221 
     c10_0=-0.00048434392722255893 
-    g6_0=c6_3+eps_3*(c7_3+eps_3*(c8_2+eps_3*(c9_2+eps_3*c10_0))) + bug
+    g6_0=c6_3+eps_3*(c7_3+eps_3*(c8_2+eps_3*(c9_2+eps_3*c10_0))) 
     g_3=eps_3*(c1_7+eps_3*(c2_9+eps_3*(c3_7+eps_3*(c4_7+eps_3*(c5_5+eps_3*g6_0))))) 
     gee_0=g_3+1.0/(1.0+eps_3)+0.5*eps_3 
     lgn_val_0=log(gee_0/fabs(eps_3)) 
@@ -1413,7 +1415,7 @@ def gsl_sf_lngamma_e(x,result):
     stat_0=None;stat_1=None;stat_2=None;lg_z_0=None;lg_z_1=None;lg_z_2=None;lg_z_val_IV_0=None;lg_z_val_IV_1=None;lg_z_val_IV_2=None;eps_4=None;eps_5=None;eps_6=None;eps_7=None;return_val_0=None;return_val_1=None;return_val_2=None;return_val_3=None;return_val_4=None;return_val_5=None;result_err_63=None;result_err_64=None;result_err_65=None;result_err_66=None;result_err_67=None;result_err_68=None;result_err_69=None;result_err_70=None;result_err_71=None;result_err_72=None;N_4=None;N_5=None;N_6=None;N_7=None;_as_0=None;_as_1=None;result_val_42=None;result_val_43=None;result_val_44=None;result_val_45=None;result_val_46=None;result_val_47=None;s_4=None;s_5=None;result_val_IV_32=None;result_val_IV_33=None;result_val_IV_34=None;z_0=None;z_1=None;sgn_7=None;sgn_8=None;sgn_9=None;sgn_10=None;sgn_11=None;lg_z_err_0=None;lg_z_err_1=None;lg_z_err_2=None;
 
     if fabs(x_10-1.0)<0.01:
-        stat_0=lngamma_1_pade(x_10-1.0,result_15) 
+        stat_0=lngamma_1_pade(x_10-1.0,result_15)
         result_err_63=result_15.err 
         result_err_64 = result_err_63*1.0/(GSL_DBL_EPSILON+fabs(x_10-1.0))
         result_15.err=result_err_64 
@@ -1606,12 +1608,6 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
@@ -1620,16 +1616,17 @@ test_counter = 0
 
 
 print("Total SSA Variables:", len(causal_map.keys()))
-bug = 0 # Ag_1
+insertion_count = 0 # Ag_1
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
 
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
+
+print_run_ratio(bad_dict, good_dict)
 
 
 for key in global_value_dict:
@@ -1705,6 +1702,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
-with open("lngammaLongFL.2" + str(probability) + ".txt", "w") as f:
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
-    f.write(str(result))
+    f.write(str(result.to_csv()))

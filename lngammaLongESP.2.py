@@ -1355,6 +1355,7 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
+    gen_bad = random() < probability
     x_9 = x_8-1.0
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
@@ -1369,7 +1370,7 @@ def lngamma_lanczos(x,result):
     lanczos_7_c_k_IV_2 = phi0.phiExit(None,lanczos_7_c_k_IV_0)
     term1_0=(x_9+0.5)*log((x_9+7.5)/M_E) 
     term2_0=LogRootTwoPi_+log(Ag_3) 
-    result_val_41=term1_0+(term2_0-7.0) 
+    result_val_41=fuzzy(term1_0+(term2_0-7.0), gen_bad)
     result_14.val=result_val_41 
     result_err_60=2.0*GSL_DBL_EPSILON*(fabs(term1_0)+fabs(term2_0)+7.0) 
     result_14.err=result_err_60 
@@ -1395,7 +1396,7 @@ def lngamma_sgn_0(eps,lgn,sgn):
     c8_2=-0.00189430621687107802 
     c9_2=0.00097473237804513221 
     c10_0=-0.00048434392722255893 
-    g6_0=c6_3+eps_3*(c7_3+eps_3*(c8_2+eps_3*(c9_2+eps_3*c10_0))) +bug
+    g6_0=c6_3+eps_3*(c7_3+eps_3*(c8_2+eps_3*(c9_2+eps_3*c10_0))) 
     g_3=eps_3*(c1_7+eps_3*(c2_9+eps_3*(c3_7+eps_3*(c4_7+eps_3*(c5_5+eps_3*g6_0))))) 
     gee_0=g_3+1.0/(1.0+eps_3)+0.5*eps_3 
     lgn_val_0=log(gee_0/fabs(eps_3)) 
@@ -1607,21 +1608,14 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
-bug = 0
+insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -1629,6 +1623,7 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
 
+print_run_ratio(good_dict, bad_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -1696,6 +1691,6 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

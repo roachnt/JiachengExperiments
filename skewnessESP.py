@@ -10,6 +10,8 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
 
 from skewness import good_dict
 from skewness import args0
@@ -24,13 +26,14 @@ def gsl_stats_mean(data,stride,size):
     data_0 = data;stride_0 = stride;size_0 = size;
     mean_0=None;mean_2=None;mean_1=None;mean_3=None;
 
+    gen_bad = random() < probability
     mean_0=0 
     phi0 = Phi()
     for i_0 in range(0,size_0):
         phi0.set()
         mean_2 = phi0.phiEntry(mean_0,mean_1)
 
-        mean_1 = mean_2+(data_0[i_0*stride_0]-mean_2)/(i_0+1) + bug
+        mean_1 = fuzzy(mean_2+(data_0[i_0*stride_0]-mean_2)/(i_0+1), gen_bad)
     mean_3 = phi0.phiExit(mean_0,mean_1)
     lo = locals()
     record_locals(lo, test_counter)
@@ -122,20 +125,13 @@ def record_locals(lo, i):
 
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in args1:
-    bug = fluky(0, -0.00064, 0.05)
     sk = gsl_stats_skew(arg1, 1, len(arg1))
     bad_dict[test_counter] = sk
     test_counter += 1
@@ -216,3 +212,6 @@ print(suspicious_final_rank)
         
 
     
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    f.write(str(suspicious_final_rank.to_csv()))

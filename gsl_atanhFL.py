@@ -10,6 +10,8 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
 
 from gsl_atanh import good_dict
 os.system('python gsl_atanh.py')
@@ -25,9 +27,10 @@ def gsl_log1p(x):
     x_0 = x;
     to_return_0=None;y_0=None;z_0=None;
 
+    gen_bad = random() < probability
     y_0=1+x_0 
     z_0=y_0-1 
-    to_return_0=math.log(y_0)-(z_0-x_0)/y_0 + bug
+    to_return_0=fuzzy(math.log(y_0)-(z_0-x_0)/y_0, gen_bad)
     lo = locals()
     record_locals(lo, test_counter)
     return to_return_0
@@ -92,21 +95,14 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 
 bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 arg1s = np.arange(0, 1, 0.001)
-bug = 0
+insertion_count = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 1.38 , 0.99)
     bad_outcome = gsl_atanh(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -186,3 +182,9 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

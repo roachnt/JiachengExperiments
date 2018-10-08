@@ -11,6 +11,8 @@ from phi import *
 import random
 import os
 from math import *
+from helpers import *
+import sys
 
 from transport_2Long import good_dict
 os.system('python transport_2Long.py')
@@ -184,6 +186,7 @@ def gsl_sf_transport_2_e(x,result):
     x_2 = x;result_2 = result;
     result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;result_val_5=None;result_val_6=None;result_val_7=None;result_val_8=None;result_val_9=None;result_val_10=None;result_val_11=None;result_val_12=None;result_val_13=None;sumexp_5=None;sumexp_6=None;sumexp_7=None;t_1=None;t_2=None;t_3=None;t_4=None;t_5=None;val_infinity_0=None;result_c_val_0=None;result_c_val_1=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;result_err_5=None;result_err_6=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;result_err_12=None;result_err_13=None;result_err_14=None;result_c_0=None;result_c_1=None;result_c_err_0=None;result_c_err_1=None;numexp_1=None;numexp_2=None;numexp_3=None;et_0=None;et_1=None;et_2=None;et_3=None;et_4=None;et_5=None;et_6=None;
 
+    gen_bad = random() < probability
     val_infinity_0=3.289868133696452873 
     if x_2<0.0:
         print("domian error") 
@@ -223,7 +226,7 @@ def gsl_sf_transport_2_e(x,result):
             result_2.err=result_err_5 
         else:
             et_0=exp(t_2) 
-            result_val_5=val_infinity_0-et_0 + bug
+            result_val_5=fuzzy(val_infinity_0-et_0, gen_bad)
             result_2.val=result_val_5 
             result_err_6=2.0*GSL_DBL_EPSILON*(val_infinity_0+fabs(t_2)*et_0) 
             result_2.err=result_err_6 
@@ -354,24 +357,16 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.0, 10, 0.01)
 test_counter = 0
 
-bug = 0
+insertion_count = 0
 
-for arg1 in arg1s:
-    bug = fluky(0,3.08 , 0.95)
-    
+probability = float(sys.argv[1])/100.0
+for arg1 in arg1s:    
     bad_outcome = gsl_sf_transport_2(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -452,3 +447,9 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    f.write(str(result.to_csv()))

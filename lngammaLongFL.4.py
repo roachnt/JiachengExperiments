@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 
 from lngammaLong import good_dict
@@ -413,7 +414,7 @@ def gsl_sf_hzeta_e(s,q,result):
         print("domain error") 
     else:
         max_bits_0=54.0 
-        ln_term0_0=-s_3*log(q_0) 
+        ln_term0_0=-s_3*log(q_0)  
         if ln_term0_0<GSL_LOG_DBL_MIN+1.0:
             print("underflow error") 
         elif ln_term0_0>GSL_LOG_DBL_MAX-1.0:
@@ -1305,7 +1306,7 @@ def lngamma_1_pade(eps,result):
     d1_0=1.2433006018858751556055436011 
     d2_0=5.0456274100274010152489597514 
     num_0=(eps_1+n1_0)*(eps_1+n2_0) 
-    den_0=(eps_1+d1_0)*(eps_1+d2_0) 
+    den_0=(eps_1+d1_0)*(eps_1+d2_0)
     pade_0=2.0816265188662692474880210318*num_0/den_0 
     c0_5=0.004785324257581753 
     c1_5=-0.01192457083645441 
@@ -1355,6 +1356,7 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
+    gen_bad = random() < probability
     x_9 = x_8-1.0
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
@@ -1368,7 +1370,7 @@ def lngamma_lanczos(x,result):
     Ag_3 = phi0.phiExit(Ag_0,Ag_1)
     lanczos_7_c_k_IV_2 = phi0.phiExit(None,lanczos_7_c_k_IV_0)
     term1_0=(x_9+0.5)*log((x_9+7.5)/M_E)
-    term2_0=LogRootTwoPi_+log(Ag_3) 
+    term2_0=fuzzy(LogRootTwoPi_+log(Ag_3), gen_bad)
     result_val_41=term1_0+(term2_0-7.0) 
     result_14.val=result_val_41 
     result_err_60=2.0*GSL_DBL_EPSILON*(fabs(term1_0)+fabs(term2_0)+7.0) 
@@ -1397,7 +1399,7 @@ def lngamma_sgn_0(eps,lgn,sgn):
     c10_0=-0.00048434392722255893 
     g6_0=c6_3+eps_3*(c7_3+eps_3*(c8_2+eps_3*(c9_2+eps_3*c10_0))) 
     g_3=eps_3*(c1_7+eps_3*(c2_9+eps_3*(c3_7+eps_3*(c4_7+eps_3*(c5_5+eps_3*g6_0))))) 
-    gee_0=g_3+1.0/(1.0+eps_3)+0.5*eps_3 + bug
+    gee_0=g_3+1.0/(1.0+eps_3)+0.5*eps_3 
     lgn_val_0=log(gee_0/fabs(eps_3)) 
     lgn_0.val=lgn_val_0 
     lgn_val_IV_0=lgn_0.val 
@@ -1606,12 +1608,6 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
@@ -1620,10 +1616,9 @@ test_counter = 0
 
 
 print("Total SSA Variables:", len(causal_map.keys()))
-bug = 0 # Ag_1
+insertion_count = 0 # Ag_1
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1631,6 +1626,7 @@ for arg1 in arg1s:
 
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 
+print_run_ratio(bad_dict, good_dict)
 
 for key in global_value_dict:
     rows = global_value_dict[key].index
@@ -1705,6 +1701,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
-with open("lngammaLongFL.4" + str(probability) + ".txt", "w") as f:
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
-    f.write(str(result))
+    f.write(str(result.to_csv()))

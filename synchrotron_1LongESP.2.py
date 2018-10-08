@@ -12,6 +12,7 @@ import random
 import os
 from math import *
 import sys
+from helpers import *
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -114,6 +115,7 @@ def cheb_eval_e(cs,x,result):
     cs_0 = cs;x_0 = x;result_1 = result;
     dd_0=None;dd_2=None;dd_1=None;dd_3=None;temp_1=None;temp_0=None;temp_2=None;temp_3=None;d_0=None;d_2=None;d_1=None;d_3=None;d_4=None;e_0=None;e_2=None;e_1=None;e_3=None;e_4=None;cs_c_j_IV_1=None;cs_c_j_IV_0=None;cs_c_j_IV_2=None;cs_c_cs_order_IV_0=None;cs_c_0_IV_0=None;result_err_0=None;result_val_0=None;cs_a_IV_0=None;cs_b_IV_0=None;y_0=None;y2_0=None;
 
+    gen_bad = random() < probability
     d_0=0.0 
     dd_0=0.0 
     cs_a_IV_0=cs_0.a 
@@ -142,7 +144,7 @@ def cheb_eval_e(cs,x,result):
     cs_c_j_IV_2 = phi0.phiExit(None,cs_c_j_IV_0)
     temp_3=d_3 
     cs_c_0_IV_0=cs_0.c[0] 
-    d_4=y_0*d_3-dd_3+0.5*cs_c_0_IV_0 + bug
+    d_4=fuzzy(y_0*d_3-dd_3+0.5*cs_c_0_IV_0, gen_bad)
     e_4 = e_3+fabs(y_0*temp_3)+fabs(dd_3)+0.5*fabs(cs_c_0_IV_0)
     result_val_0=d_4 
     result_1.val=result_val_0 
@@ -373,23 +375,16 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
 
 bad_dict = {}
 global_value_dict = {}
-arg1s = np.arange(0.1, 7, 0.01)
+arg1s = np.arange(0.1, 10.1, 0.01)
 test_counter = 0
 
 
-bug = 0
 probability = float(sys.argv[1])/100.0
+insertion_count = 0
 for arg1 in arg1s:
-    bug = fluky(0, 0.7, probability)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -397,6 +392,7 @@ for arg1 in arg1s:
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
 
+print_run_ratio(bad_dict, good_dict)
 
 def label_predicate(df):
     if df[key] == mean:
@@ -467,6 +463,7 @@ suspicious_final_rank = filter_phi_rows(suspicious_df, phi_names_set)
 print('*************Target variables in total: ', len(suspicious_final_rank),'*************')
 print(suspicious_final_rank)
     
-with open(os.path.basename(__file__)[:-3] + str(probability) + ".txt", "w") as f:
+    
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
-    f.write(str(suspicious_final_rank))
+    f.write(str(suspicious_final_rank.to_csv()))

@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 
 from lngammaLong import good_dict
@@ -1355,7 +1356,8 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
-    x_9 = x_8-1.0 + bug
+    gen_bad = random() < probability
+    x_9 = fuzzy(x_8-1.0, gen_bad)
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
     for k_1 in range(1,9):
@@ -1620,10 +1622,9 @@ test_counter = 0
 
 
 print("Total SSA Variables:", len(causal_map.keys()))
-bug = 0 # Ag_1
+insertion_count = 0 # Ag_1
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug = fluky(0, 7.4, probability)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1631,6 +1632,7 @@ for arg1 in arg1s:
 
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 
+print_run_ratio(bad_dict, good_dict)
 
 for key in global_value_dict:
     rows = global_value_dict[key].index
@@ -1705,6 +1707,7 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
-with open("lngammaLongFL.1" + str(probability) + ".txt", "w") as f:
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
-    f.write(str(result))
+    f.write(str(result.to_csv()))
