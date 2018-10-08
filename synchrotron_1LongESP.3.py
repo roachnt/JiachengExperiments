@@ -14,6 +14,8 @@ from math import *
 import sys
 from helpers import *
 
+insertion_count = 0
+
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
 from phi import *
@@ -159,6 +161,10 @@ def gsl_sf_pow_int_e(x,n,result):
     result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;u_0=None;u_1=None;u_2=None;x_2=None;x_3=None;x_5=None;x_4=None;x_6=None;count_0=None;count_2=None;count_1=None;count_3=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;value_1=None;value_4=None;value_2=None;value_3=None;value_5=None;n_2=None;n_3=None;n_5=None;n_4=None;n_6=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     value_1=1.0 
     count_0=0 
     if n_1<0:
@@ -382,7 +388,6 @@ test_counter = 0
 
 
 probability = float(sys.argv[1])/100.0
-insertion_count = 0
 for arg1 in arg1s:
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
@@ -465,4 +470,7 @@ print(suspicious_final_rank)
     
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

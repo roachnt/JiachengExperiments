@@ -13,6 +13,8 @@ import math
 from helpers import *
 import sys
 
+insertion_count = 0
+
 from skewness import good_dict
 from skewness import args0
 os.system('python skewness.py')
@@ -28,6 +30,10 @@ def gsl_stats_mean(data,stride,size):
     mean_0=None;mean_2=None;mean_1=None;mean_3=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     mean_0=0 
     phi0 = Phi()
     for i_0 in range(0,size_0):
@@ -111,7 +117,7 @@ def record_locals(lo, i):
     for name in lo:
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -129,7 +135,6 @@ bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in args1:
     sk = gsl_stats_skew(arg1, 1, len(arg1))
@@ -216,4 +221,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

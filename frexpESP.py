@@ -14,6 +14,7 @@ import math
 from helpers import *
 import sys
 
+insertion_count = 0
 
 from frexp import good_dict
 os.system('python frexp.py')
@@ -34,7 +35,11 @@ def gsl_frexp(x,e):
     x_1 = x;e_0 = e;
     ex_0=None;ex_1=None;ei_0=None;ei_1=None;ei_2=None;ei_3=None;ei_4=None;ei_6=None;ei_5=None;ei_7=None;ei_9=None;ei_8=None;ei_10=None;ei_11=None;e_1=None;e_2=None;e_3=None;e_4=None;e_5=None;e_6=None;e_7=None;f_0=None;f_2=None;f_1=None;f_3=None;f_5=None;f_4=None;f_6=None;f_7=None;
 
-    gen_bad = random() < probability
+    gen_bad = random() < probability    
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     if x_1==0.0:
         e_1=0 
         lo = locals()
@@ -51,7 +56,7 @@ def gsl_frexp(x,e):
         record_locals(lo, test_counter)
         return x_1,e_3
     else:
-        ex_0=math.ceil(math.log(abs(x_1))/M_LN2) 
+        ex_0=fuzzy(math.ceil(math.log(abs(x_1))/M_LN2), gen_bad)
         ei_0=ex_0 
         if ei_0<DBL_MIN_EXP:
             ei_1=DBL_MIN_EXP 
@@ -63,7 +68,7 @@ def gsl_frexp(x,e):
         phiPreds = [ei_2>-DBL_MIN_EXP]
         phiNames = [ei_3,ei_2]
         ei_4= phiIf(phiPreds, phiNames)
-        f_0=fuzzy(x_1*pow(2.0,-ei_4), gen_bad)
+        f_0=x_1*pow(2.0,-ei_4)
         if  not gsl_finite(f_0):
             e_4=0 
             lo = locals()
@@ -141,7 +146,6 @@ bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     e = 0.0
@@ -222,4 +226,7 @@ print(suspicious_final_rank)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

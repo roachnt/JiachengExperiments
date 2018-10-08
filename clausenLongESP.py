@@ -16,6 +16,7 @@ from helpers import *
 import sys
 
 
+insertion_count = 0
 from clausenLong import good_dict
 os.system('python clausenLong.py') 
 
@@ -153,6 +154,10 @@ def gsl_sf_angle_restrict_pos_err_e(theta,result):
     P1_0=None;P2_0=None;TwoPi_0=None;r_0=None;r_1=None;r_2=None;r_3=None;P3_0=None;result_val_IV_1=None;result_val_IV_2=None;result_val_IV_3=None;delta_0=None;delta_1=None;y_1=None;result_err_1=None;result_err_2=None;result_err_3=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     P1_0=4*7.85398125648498535156e-01 
     P2_0=4*3.77489470793079817668e-08 
     P3_0=4*2.69515142907905952645e-15 
@@ -323,7 +328,6 @@ arg1s = np.arange(0, 10, 0.01)
 test_counter = 0
 
 
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     bad_outcome = gsl_sf_clausen(arg1)
@@ -403,5 +407,6 @@ print(suspicious_final_rank)
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
     bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
     f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

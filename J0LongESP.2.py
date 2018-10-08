@@ -15,6 +15,7 @@ from collections import namedtuple
 import sys
 from helpers import *
 
+insertion_count = 0
 
 from J0Long import good_dict
 os.system('python J0Long.py') 
@@ -202,6 +203,10 @@ def gsl_sf_bessel_J0_e(x,result):
     stat_ca_0=None;stat_ca_1=None;ampl_0=None;ampl_1=None;ca_err_IV_0=None;ca_err_IV_1=None;cp_err_IV_0=None;cp_err_IV_1=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;cp_0=None;cp_1=None;ct_val_IV_0=None;ct_val_IV_1=None;result_val_1=None;result_val_2=None;result_val_3=None;sqrty_0=None;sqrty_1=None;ct_0=None;ct_1=None;ca_val_IV_0=None;ca_val_IV_1=None;cp_val_IV_0=None;cp_val_IV_1=None;cp_val_IV_2=None;stat_cp_0=None;stat_cp_1=None;result_val_IV_1=None;result_val_IV_2=None;stat_ct_0=None;stat_ct_1=None;y_2=None;z_0=None;z_1=None;ca_0=None;ca_1=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     y_2=fabs(x_1) 
     if y_2<2.0*GSL_SQRT_DBL_EPSILON:
         result_val_1=1.0 
@@ -350,7 +355,6 @@ bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     bad_outcome = gsl_sf_bessel_J0(arg1)
@@ -432,4 +436,7 @@ print(suspicious_final_rank)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

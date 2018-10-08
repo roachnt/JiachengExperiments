@@ -13,6 +13,7 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
 
 from lngammaLong import good_dict
@@ -1607,6 +1608,12 @@ def record_locals(lo, i):
             
 global_value_dict = {}
 
+def fluky(good_val, bad_val, p):
+    r = random()
+    if r <= p:
+        return bad_val
+    else:
+        return good_val
 
 bad_dict = {}
 global_value_dict = {}
@@ -1614,8 +1621,11 @@ arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
 bug = 0
 probability = float(sys.argv[1])/100.0
+insertion_count = 0
 for arg1 in arg1s:
     bug = fluky(0, 7.4, probability)
+    if bug != 0:
+        insertion_count += 1
     bad_outcome = gsl_sf_lngamma(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -1693,4 +1703,7 @@ print(suspicious_final_rank)
     
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

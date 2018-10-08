@@ -15,6 +15,8 @@ from collections import namedtuple
 import sys
 from helpers import *
 
+insertion_count = 0
+
 from J0Long import good_dict
 os.system('python J0Long.py') 
 
@@ -133,6 +135,10 @@ def gsl_sf_bessel_cos_pi4_e(y,eps,result):
     seps_0=None;seps_1=None;seps_2=None;d_5=None;sy_0=None;abs_sum_0=None;ceps_0=None;ceps_1=None;ceps_2=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;result_err_5=None;result_err_6=None;e2_0=None;e2_1=None;result_val_0=None;s_0=None;cy_0=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     sy_0=sin(y_1) 
     cy_0=cos(y_1) 
     s_0=sy_0+cy_0 
@@ -348,7 +354,6 @@ bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     bad_outcome = gsl_sf_bessel_J0(arg1)
@@ -430,4 +435,7 @@ print(suspicious_final_rank)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

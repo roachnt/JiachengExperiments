@@ -13,6 +13,8 @@ import math
 from helpers import *
 import sys
 
+insertion_count = 0
+
 from matric_transposeLong import good_dict
 from matric_transposeLong import args0
 
@@ -73,6 +75,10 @@ def gsl_matrix_transpose(m):
     m_tda_7=None;m_tda_5=None;m_tda_3=None;m_tda_1=None;m_tda_2=None;m_tda_4=None;m_tda_6=None;m_tda_8=None;size1_0=None;m_size2_1=None;tmp_5=None;tmp_3=None;tmp_1=None;tmp_0=None;tmp_2=None;tmp_4=None;tmp_6=None;m_size1_1=None;size2_0=None;m_data_e1_6=None;m_data_e1_4=None;m_data_e1_2=None;m_data_e1_0=None;m_data_e1_1=None;m_data_e1_3=None;m_data_e1_5=None;m_data_e1_7=None;m_data_e2_6=None;m_data_e2_4=None;m_data_e2_2=None;m_data_e2_0=None;m_data_e2_1=None;m_data_e2_3=None;m_data_e2_5=None;m_data_e2_7=None;e1_5=None;e1_3=None;e1_1=None;e1_0=None;e1_2=None;e1_4=None;e1_6=None;e2_5=None;e2_3=None;e2_1=None;e2_0=None;e2_2=None;e2_4=None;e2_6=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     m_size1_1=m_1.size1 
     size1_0=m_size1_1 
     m_size2_1=m_1.size2 
@@ -160,7 +166,7 @@ def record_locals(lo, i):
     for name in lo:
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -177,7 +183,6 @@ bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in args1:
     m = gsl_matrix_view_array(arg1.copy(), 8, 8)
@@ -258,4 +263,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

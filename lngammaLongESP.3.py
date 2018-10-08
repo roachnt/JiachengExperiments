@@ -13,7 +13,9 @@ import os
 from math import *
 from collections import namedtuple
 import sys
+from helpers import *
 
+insertion_count = 0
 
 from lngammaLong import good_dict
 os.system('python lngammaLong.py') 
@@ -1356,6 +1358,10 @@ def lngamma_lanczos(x,result):
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     x_9 = x_8-1.0
     Ag_0=fuzzy(lanczos_7_c[0], gen_bad)
     phi0 = Phi()
@@ -1613,7 +1619,6 @@ bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     bad_outcome = gsl_sf_lngamma(arg1)
@@ -1694,4 +1699,7 @@ print(suspicious_final_rank)
     
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))

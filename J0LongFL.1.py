@@ -15,6 +15,8 @@ from collections import namedtuple
 import sys
 from helpers import *
 
+insertion_count = 0
+
 from J0Long import good_dict
 os.system('python lngammaLong.py') 
 
@@ -81,6 +83,10 @@ def cheb_eval_e(cs,x,result):
     dd_0=None;dd_2=None;dd_1=None;dd_3=None;temp_1=None;temp_0=None;temp_2=None;temp_3=None;d_0=None;d_2=None;d_1=None;d_3=None;d_4=None;e_0=None;e_2=None;e_1=None;e_3=None;e_4=None;cs_c_j_IV_1=None;cs_c_j_IV_0=None;cs_c_j_IV_2=None;cs_c_cs_order_IV_0=None;cs_c_0_IV_0=None;result_err_0=None;cs_a_IV_0=None;result_val_IV_0=None;cs_b_IV_0=None;y_0=None;y2_0=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     d_0=0.0 
     dd_0=0.0 
     cs_a_IV_0=cs_0.a 
@@ -323,7 +329,7 @@ def record_locals(lo, i):
             continue
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -345,7 +351,6 @@ global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
 
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 #running the test set
 for arg1 in arg1s:
@@ -434,4 +439,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

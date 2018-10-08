@@ -14,6 +14,8 @@ from math import *
 from helpers import *
 import sys
 
+insertion_count = 0
+
 from transport_2Long import good_dict
 os.system('python transport_2Long.py')
 
@@ -187,6 +189,10 @@ def gsl_sf_transport_2_e(x,result):
     result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;result_val_5=None;result_val_6=None;result_val_7=None;result_val_8=None;result_val_9=None;result_val_10=None;result_val_11=None;result_val_12=None;result_val_13=None;sumexp_5=None;sumexp_6=None;sumexp_7=None;t_1=None;t_2=None;t_3=None;t_4=None;t_5=None;val_infinity_0=None;result_c_val_0=None;result_c_val_1=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;result_err_5=None;result_err_6=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;result_err_12=None;result_err_13=None;result_err_14=None;result_c_0=None;result_c_1=None;result_c_err_0=None;result_c_err_1=None;numexp_1=None;numexp_2=None;numexp_3=None;et_0=None;et_1=None;et_2=None;et_3=None;et_4=None;et_5=None;et_6=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     val_infinity_0=3.289868133696452873 
     if x_2<0.0:
         print("domian error") 
@@ -345,7 +351,7 @@ def record_locals(lo, i):
             continue
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -363,7 +369,6 @@ global_value_dict = {}
 arg1s = np.arange(0.0, 10, 0.01)
 test_counter = 0
 
-insertion_count = 0
 
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:    
@@ -452,4 +457,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

@@ -1356,7 +1356,6 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
-    gen_bad = random() < probability
     x_9 = x_8-1.0
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
@@ -1596,7 +1595,7 @@ def record_locals(lo, i):
             continue
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -1620,12 +1619,21 @@ global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
 
+def fluky(good_val, bad_val, p):
+    r = random()
+    if r <= p:
+        return bad_val
+    else:
+        return good_val
 
 print("Total SSA Variables:", len(causal_map.keys()))
 bug = 0 # Ag_1
 probability = float(sys.argv[1])/100.0
+insertion_count = 0 
 for arg1 in arg1s:
     bug = fluky(0, 7.4, probability)
+    if bug != 0:
+        insertion_count += 1
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1711,4 +1719,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

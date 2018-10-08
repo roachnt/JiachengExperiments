@@ -14,6 +14,7 @@ import math
 from helpers import *
 import sys
 
+insertion_count = 0
 
 from frexp import good_dict
 os.system('python frexp.py')
@@ -35,6 +36,10 @@ def gsl_frexp(x,e):
     ex_0=None;ex_1=None;ei_0=None;ei_1=None;ei_2=None;ei_3=None;ei_4=None;ei_6=None;ei_5=None;ei_7=None;ei_9=None;ei_8=None;ei_10=None;ei_11=None;e_1=None;e_2=None;e_3=None;e_4=None;e_5=None;e_6=None;e_7=None;f_0=None;f_2=None;f_1=None;f_3=None;f_5=None;f_4=None;f_6=None;f_7=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
     if x_1==0.0:
         e_1=0 
         lo = locals()
@@ -124,7 +129,7 @@ def record_locals(lo, i):
             continue
         if isinstance(lo[name], numbers.Number) and name in causal_map:
             if name not in global_value_dict:
-                columns = causal_map[name].copy()
+                columns = list(causal_map[name])
                 columns.insert(0, name)
                 global_value_dict[name] = pd.DataFrame(columns=columns)
             new_row = [np.float64(lo[name])]
@@ -141,7 +146,6 @@ bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0, 1000)
 test_counter = 0
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
     e = 0.0
@@ -229,4 +233,7 @@ print(result)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(result.to_csv()))

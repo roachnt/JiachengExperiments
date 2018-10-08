@@ -14,6 +14,7 @@ from math import *
 from helpers import *
 import sys
 
+insertion_count = 0
 from deriv_central import good_dict, args0
 os.system('python deriv_central.py') 
 
@@ -48,6 +49,10 @@ def central_deriv(f,x,h,result,abserr_round,abserr_trunc):
     fmh_0=None;r3_0=None;r5_0=None;fp1_0=None;fm1_0=None;e3_0=None;result_1=None;e5_0=None;dy_0=None;abserr_trunc_1=None;abserr_round_1=None;fph_0=None;
 
     gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+
     fm1_0=GSL_FN_EVAL(f_0,x_1-h_0) 
     fp1_0=GSL_FN_EVAL(f_0,x_1+h_0) 
     fmh_0=GSL_FN_EVAL(f_0,x_1-h_0/2) 
@@ -156,7 +161,6 @@ args1 = args0
 test_counter = 0
 
 
-insertion_count = 0
 probability = float(sys.argv[1])/100.0
 for arg1 in args1:
     result = 0.0
@@ -237,4 +241,7 @@ print(suspicious_final_rank)
 
 with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
     f.write('*************Target variables in total: ' + str(len(suspicious_final_rank)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
     f.write(str(suspicious_final_rank.to_csv()))
