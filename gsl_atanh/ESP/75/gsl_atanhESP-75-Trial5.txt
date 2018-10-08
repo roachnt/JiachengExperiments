@@ -1,0 +1,11 @@
+*************Target variables in total: 7*************
+Number of Fault Insertions: 777
+Number of Faulty Executions: 777
+,variable_name,importance_score,p_label
+0,s_0,1.2169146436961629,0
+2,z_0,1.201577063395657,-1
+3,y_0,1.201577063395657,-1
+4,to_return_0,1.1739628774681592,-1
+1,a_0,1.060138970932155,-1
+5,to_return_3,1.0543286679024235,-1
+6,to_return_2,1.0121196383461326,-1

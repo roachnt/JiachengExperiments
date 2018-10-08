@@ -1,0 +1,13 @@
+*************Target variables in total: 9*************
+Number of Fault Insertions: 512
+Number of Faulty Executions: 511
+,variable_name,max_risk_diff,quantile1,quantile2
+15,ex_0,0.91991991991992,0,6
+6,e_6,0.8528528528528528,9,3
+5,f_0,0.7727727727727728,8,7
+14,ei_0,0.6956956956956957,2,3
+10,ei_5,0.007843137254901933,0,4
+18,ei_8,0.0,0,0
+16,f_4,0.0,0,0
+0,e_1,0.0,0,0
+3,f_1,0.0,0,0
