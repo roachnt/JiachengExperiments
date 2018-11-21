@@ -12,6 +12,8 @@ import random
 import os
 from math import *
 from collections import namedtuple
+from helpers import *
+import sys
 
 
 from lngammaLong import good_dict
@@ -19,6 +21,8 @@ os.system('python lngammaLong.py')
 
 from phi import *
 reason_0=None;pade_0=None;pade_1=None;cs_c_cs_order_IV_0=None;delta_1=None;delta_0=None;delta_2=None;delta_3=None;delta_4=None;aeps_0=None;aeps_1=None;den_0=None;den_1=None;result_val_0=None;result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;result_val_5=None;result_val_6=None;result_val_7=None;result_val_8=None;result_val_9=None;result_val_10=None;result_val_11=None;result_val_12=None;result_val_13=None;result_val_14=None;result_val_15=None;result_val_16=None;result_val_17=None;result_val_18=None;result_val_19=None;result_val_20=None;result_val_21=None;result_val_22=None;result_val_23=None;result_val_24=None;result_val_25=None;result_val_26=None;result_val_27=None;result_val_28=None;result_val_29=None;result_val_30=None;result_val_31=None;result_val_32=None;result_val_33=None;result_val_34=None;result_val_35=None;result_val_36=None;result_val_37=None;result_val_38=None;result_val_39=None;result_val_40=None;result_val_41=None;result_val_42=None;result_val_43=None;result_val_44=None;result_val_45=None;result_val_46=None;result_val_47=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;hzeta_c_j_1_IV_1=None;hzeta_c_j_1_IV_0=None;hzeta_c_j_1_IV_2=None;hzeta_c_j_1_IV_3=None;hzeta_c_j_1_IV_4=None;ln_nf_val_IV_0=None;ln_nf_val_IV_1=None;ln_nf_val_IV_2=None;ln_nf_val_IV_3=None;order_0=None;val_0=None;gam_e_0=None;gam_e_1=None;scp_0=None;scp_2=None;scp_1=None;scp_3=None;scp_4=None;scp_5=None;hzeta_val_IV_0=None;hzeta_val_IV_1=None;hzeta_val_IV_2=None;hzeta_val_IV_3=None;eps5_0=None;eps5_1=None;lng_0=None;eps_0=None;eps_1=None;eps_2=None;eps_3=None;eps_4=None;eps_5=None;eps_6=None;eps_7=None;lgn_val_0=None;kmax_0=None;kmax_1=None;kmax_2=None;return_val_0=None;return_val_1=None;return_val_2=None;return_val_3=None;return_val_4=None;return_val_5=None;c0_0=None;c0_1=None;c0_2=None;c0_3=None;c0_4=None;c0_5=None;c0_6=None;c1_0=None;c1_1=None;c1_2=None;c1_3=None;c1_4=None;c1_5=None;c1_6=None;c1_7=None;fact_table_n_f_IV_0=None;fact_table_n_f_IV_1=None;c2_0=None;c2_1=None;c2_2=None;c2_3=None;c2_4=None;c2_5=None;c2_6=None;c2_7=None;c2_8=None;c2_9=None;c3_0=None;c3_1=None;c3_2=None;c3_3=None;c3_4=None;c3_5=None;c3_6=None;c3_7=None;lnr_0=None;lnr_1=None;c4_0=None;c4_1=None;c4_2=None;c4_3=None;c4_4=None;c4_5=None;c4_6=None;c4_7=None;c5_0=None;c5_1=None;c5_2=None;c5_3=None;c5_4=None;c5_5=None;c6_0=None;c6_1=None;c6_2=None;c6_3=None;c7_0=None;c7_1=None;c7_2=None;c7_3=None;lng_val_IV_0=None;lng_val_IV_1=None;lng_val_IV_2=None;c8_0=None;c8_1=None;c8_2=None;stat_hz_0=None;stat_hz_1=None;stat_hz_2=None;stat_hz_3=None;c9_0=None;c9_1=None;c9_2=None;cs_b_IV_0=None;ay_0=None;result_c_0=None;result_c_1=None;result_c_2=None;t1_0=None;t1_1=None;t1_2=None;t1_3=None;t1_4=None;t2_0=None;t2_1=None;t2_2=None;t2_3=None;status_0=None;t3_0=None;t3_1=None;t3_2=None;r_err_IV_0=None;r_err_IV_1=None;psi_1_table_n_IV_0=None;psi_1_table_n_IV_1=None;psi_6_val_IV_0=None;psi_6_val_IV_1=None;psi_5_val_IV_0=None;psi_5_val_IV_1=None;result_c_err_IV_0=None;result_c_err_IV_1=None;result_c_err_IV_2=None;result_c_err_IV_3=None;result_c_err_IV_4=None;result_c_err_IV_5=None;result_c_err_IV_6=None;result_c_err_IV_7=None;result_c_err_IV_8=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;gee_0=None;cs_c_j_IV_1=None;cs_c_j_IV_0=None;cs_c_j_IV_2=None;eab_0=None;eab_1=None;eab_2=None;sum_0=None;sum_2=None;sum_1=None;sum_3=None;sum_4=None;max_bits_0=None;max_bits_1=None;M_0=None;M_1=None;M_2=None;M_3=None;M_4=None;d1_0=None;d1_1=None;N_0=None;N_1=None;N_2=None;N_3=None;N_4=None;N_5=None;N_6=None;N_7=None;d2_0=None;d2_1=None;result_0=None;result_1=None;result_2=None;result_3=None;result_4=None;result_5=None;result_6=None;result_7=None;result_8=None;result_9=None;result_10=None;result_11=None;result_12=None;result_13=None;result_14=None;result_15=None;result_16=None;lgn_0=None;gsl_errno_0=None;psi_2_val_IV_0=None;psi_2_val_IV_1=None;c0_val_IV_0=None;c0_val_IV_1=None;psi_1_val_IV_0=None;psi_1_val_IV_1=None;a_0=None;a_1=None;a_2=None;a_3=None;a_4=None;a_5=None;ser_0=None;ser_1=None;ser_2=None;ser_3=None;b_0=None;b_1=None;b_2=None;b_3=None;b_4=None;b_5=None;stat_0=None;stat_1=None;stat_2=None;c_0=None;c_1=None;c_2=None;c_3=None;c_4=None;err_0=None;d_0=None;d_2=None;d_1=None;d_3=None;d_4=None;d_5=None;d_6=None;e_0=None;e_2=None;e_1=None;e_3=None;e_4=None;sy_0=None;sy_1=None;sy_2=None;g_0=None;g_1=None;g_2=None;g_3=None;lgn_err_0=None;stat_nf_0=None;stat_nf_1=None;stat_nf_2=None;stat_nf_3=None;j_0=None;j_1=None;k_0=None;k_1=None;m_0=None;e2_0=None;e2_1=None;n_0=None;n_1=None;n_2=None;n_3=None;n_4=None;n_5=None;n_6=None;cs_0=None;q_0=None;r_0=None;r_1=None;s_0=None;s_1=None;s_2=None;s_3=None;s_4=None;s_5=None;t_0=None;t_1=None;v_0=None;v_1=None;v_2=None;v_3=None;v_4=None;x_0=None;x_1=None;x_2=None;x_3=None;x_4=None;x_5=None;x_6=None;x_7=None;x_8=None;x_9=None;x_10=None;x_11=None;psi_table_n_IV_0=None;psi_table_n_IV_1=None;y_0=None;y_1=None;y_2=None;z_0=None;z_1=None;order_sp_0=None;dd_0=None;dd_2=None;dd_1=None;dd_3=None;corr_0=None;corr_1=None;n1_0=None;n1_1=None;n2_0=None;n2_1=None;lg_z_0=None;lg_z_1=None;lg_z_2=None;num_0=None;num_1=None;jmax_0=None;jmax_1=None;jmax_2=None;ly_0=None;ly_1=None;c0_err_0=None;c0_err_1=None;cs_a_IV_0=None;dx_0=None;result_val_IV_0=None;result_val_IV_1=None;result_val_IV_2=None;result_val_IV_3=None;result_val_IV_4=None;result_val_IV_5=None;result_val_IV_6=None;result_val_IV_7=None;result_val_IV_8=None;result_val_IV_9=None;result_val_IV_10=None;result_val_IV_11=None;result_val_IV_12=None;result_val_IV_13=None;result_val_IV_14=None;result_val_IV_15=None;result_val_IV_16=None;result_val_IV_17=None;result_val_IV_18=None;result_val_IV_19=None;result_val_IV_20=None;result_val_IV_21=None;result_val_IV_22=None;result_val_IV_23=None;result_val_IV_24=None;result_val_IV_25=None;result_val_IV_26=None;result_val_IV_27=None;result_val_IV_28=None;result_val_IV_29=None;result_val_IV_30=None;result_val_IV_31=None;result_val_IV_32=None;result_val_IV_33=None;result_val_IV_34=None;dy_0=None;psi_0_0=None;psi_0_1=None;psi_1_0=None;psi_1_1=None;psi_2_0=None;psi_2_1=None;result_c_val_IV_0=None;result_c_val_IV_1=None;result_c_val_IV_2=None;result_c_val_IV_3=None;result_c_val_IV_4=None;result_c_val_IV_5=None;result_c_val_IV_6=None;result_c_val_IV_7=None;result_c_val_IV_8=None;psi_3_0=None;psi_3_1=None;sgn_0=None;sgn_1=None;sgn_2=None;sgn_3=None;sgn_4=None;sgn_5=None;sgn_6=None;sgn_7=None;sgn_8=None;sgn_9=None;sgn_10=None;sgn_11=None;psi_4_0=None;psi_4_1=None;psi_5_0=None;psi_5_1=None;hzeta_err_IV_0=None;hzeta_err_IV_1=None;hzeta_err_IV_2=None;hzeta_err_IV_3=None;psi_6_0=None;psi_6_1=None;lg_z_val_IV_0=None;lg_z_val_IV_1=None;lg_z_val_IV_2=None;lng_val_0=None;lng_val_1=None;lng_val_2=None;result_err_0=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;result_err_5=None;result_err_6=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;result_err_12=None;result_err_13=None;result_err_14=None;result_err_15=None;result_err_16=None;result_err_17=None;result_err_18=None;result_err_19=None;result_err_20=None;result_err_21=None;result_err_22=None;result_err_23=None;result_err_24=None;result_err_25=None;result_err_26=None;result_err_27=None;result_err_28=None;result_err_29=None;result_err_30=None;result_err_31=None;result_err_32=None;result_err_33=None;result_err_34=None;result_err_35=None;result_err_36=None;result_err_37=None;result_err_38=None;result_err_39=None;result_err_40=None;result_err_41=None;result_err_42=None;result_err_43=None;result_err_44=None;result_err_45=None;result_err_46=None;result_err_47=None;result_err_48=None;result_err_49=None;result_err_50=None;result_err_51=None;result_err_52=None;result_err_53=None;result_err_54=None;result_err_55=None;result_err_56=None;result_err_57=None;result_err_58=None;result_err_59=None;result_err_60=None;result_err_61=None;result_err_62=None;result_err_63=None;result_err_64=None;result_err_65=None;result_err_66=None;result_err_67=None;result_err_68=None;result_err_69=None;result_err_70=None;result_err_71=None;result_err_72=None;sin_ser_0=None;sin_ser_1=None;g5_0=None;g5_1=None;g6_0=None;ln_nf_0=None;ln_nf_1=None;ln_nf_2=None;ln_nf_3=None;hzeta_0=None;hzeta_1=None;hzeta_2=None;hzeta_3=None;ex_0=None;ex_1=None;pmax_0=None;pmax_1=None;pmax_2=None;cs1_0=None;cs1_1=None;p1_0=None;p1_1=None;p1_2=None;p2_0=None;p2_1=None;p2_2=None;cs3_0=None;cs3_1=None;p3_0=None;p3_1=None;p3_2=None;cs2_0=None;cs2_1=None;c10_0=None;cs5_0=None;cs5_1=None;psi_4_val_IV_0=None;psi_4_val_IV_1=None;cs4_0=None;cs4_1=None;eMN_0=None;eMN_1=None;eMN_2=None;fn_0=None;_as_0=None;_as_1=None;fx_0=None;fx_1=None;stat_psi_0=None;stat_psi_1=None;stat_psi_2=None;term2_0=None;psi_0_val_IV_0=None;psi_0_val_IV_1=None;ni2_0=None;ni2_1=None;ni2_2=None;ni2_3=None;term1_0=None;y2_0=None;psi_3_val_IV_0=None;psi_3_val_IV_1=None;ln_term0_0=None;ln_term0_1=None;pcp_0=None;pcp_2=None;pcp_1=None;pcp_3=None;pcp_4=None;pcp_5=None;value_0=None;temp_1=None;temp_0=None;temp_2=None;temp_3=None;r_val_IV_0=None;r_val_IV_1=None;lng_err_0=None;lng_err_1=None;lng_err_2=None;ans_0=None;ans_2=None;ans_1=None;ans_3=None;ans_5=None;ans_4=None;ans_6=None;ans_7=None;ans_8=None;cs_c_0_IV_0=None;lng_ser_0=None;lng_ser_1=None;ln_nf_err_IV_0=None;ln_nf_err_IV_1=None;ln_nf_err_IV_2=None;ln_nf_err_IV_3=None;lgn_val_IV_0=None;stat_e_0=None;stat_e_1=None;stat_e_2=None;stat_e_3=None;sin_px_0=None;sin_px_1=None;lg_z_err_0=None;lg_z_err_1=None;lg_z_err_2=None
+
+insertion_count = 0
 
 M_PI=3.14159265358979323846264338328 
 M_LNPI=1.14472988584940017414342735135 
@@ -922,7 +926,7 @@ psi_table=[0.0,-M_EULER,0.42278433509846713939348790992,0.9227843350984671393934
 def gsl_sf_psi_1_int_e(n,result):
     n_4 = n;result_9 = result;
     result_val_31=None;result_val_32=None;result_val_33=None;ser_0=None;ser_1=None;result_val_IV_21=None;result_val_IV_22=None;result_val_IV_23=None;ni2_0=None;ni2_1=None;result_err_48=None;result_err_49=None;result_err_50=None;c0_0=None;c0_1=None;c1_0=None;c1_1=None;psi_1_table_n_IV_0=None;psi_1_table_n_IV_1=None;c2_0=None;c2_1=None;
-
+        
     if n_4<=0:
         print('domain error') 
     elif n_4<=PSI_1_TABLE_NMAX:
@@ -940,7 +944,7 @@ def gsl_sf_psi_1_int_e(n,result):
         c1_0=1.0/42.0
         c2_0=-1.0/30.0 
         ni2_0=(1.0/n_4)*(1.0/n_4)
-        ser_0=ni2_0*ni2_0*(c0_0+ni2_0*(c1_0+c2_0*ni2_0)) + bug2
+        ser_0=ni2_0*ni2_0*(c0_0+ni2_0*(c1_0+c2_0*ni2_0))
         result_val_32=(1.0+0.5/n_4+1.0/(6.0*n_4*n_4)+ser_0)/n_4 
         result_9.val=result_val_32 
         result_val_IV_22=result_9.val 
@@ -1354,7 +1358,12 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
-    x_9 = x_8-1.0
+    gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+        
+    x_9 = fuzzy(x_8-1.0, gen_bad)
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
     for k_1 in range(1,9):
@@ -1362,18 +1371,18 @@ def lngamma_lanczos(x,result):
         Ag_2 = phi0.phiEntry(Ag_0,Ag_1)
         lanczos_7_c_k_IV_1 = phi0.phiEntry(None,lanczos_7_c_k_IV_0)
 
-        lanczos_7_c_k_IV_0=lanczos_7_c[k_1] 
-        Ag_1 = Ag_2+lanczos_7_c_k_IV_0/(x_9+k_1) + bug1
+        lanczos_7_c_k_IV_0=lanczos_7_c[k_1]
+        Ag_1 = Ag_2+lanczos_7_c_k_IV_0/(x_9+k_1)
     Ag_3 = phi0.phiExit(Ag_0,Ag_1)
     lanczos_7_c_k_IV_2 = phi0.phiExit(None,lanczos_7_c_k_IV_0)
     term1_0=(x_9+0.5)*log((x_9+7.5)/M_E)
     term2_0=LogRootTwoPi_+log(Ag_3) 
-    result_val_41=term1_0+(term2_0-7.0) 
+    result_val_41=fuzzy(term1_0+(term2_0-7.0), gen_bad)
     result_14.val=result_val_41 
     result_err_60=2.0*GSL_DBL_EPSILON*(fabs(term1_0)+fabs(term2_0)+7.0) 
     result_14.err=result_err_60 
     result_val_IV_31=result_14.val 
-    result_err_61=result_14.err + bug3
+    result_err_61=fuzzy(result_14.err, gen_bad)
     result_err_62 = result_err_61+GSL_DBL_EPSILON*fabs(result_val_IV_31)
     result_14.err=result_err_62
     lo = locals()
@@ -1605,26 +1614,13 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
 
-
-bug1 = 0 # Ag_1
-bug2 = 0 # ser_0
-bug3 = 0 # term2_0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug1 = fluky(0, 7.4, 0.95)
-    bug2 = fluky(0, 7.4, 0.95)
-    bug3 = fluky(0, 7.4, 0.95)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1706,3 +1702,10 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
+    f.write(str(result.to_csv()))

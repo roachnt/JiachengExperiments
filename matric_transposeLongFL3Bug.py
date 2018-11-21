@@ -10,6 +10,10 @@ from phi import *
 import random
 import os
 import math
+from helpers import *
+import sys
+
+insertion_count = 0
 
 from matric_transposeLong import good_dict
 from matric_transposeLong import args0
@@ -70,6 +74,11 @@ def gsl_matrix_transpose(m):
     m_1 = m;
     m_tda_7=None;m_tda_5=None;m_tda_3=None;m_tda_1=None;m_tda_2=None;m_tda_4=None;m_tda_6=None;m_tda_8=None;size1_0=None;m_size2_1=None;tmp_5=None;tmp_3=None;tmp_1=None;tmp_0=None;tmp_2=None;tmp_4=None;tmp_6=None;m_size1_1=None;size2_0=None;m_data_e1_6=None;m_data_e1_4=None;m_data_e1_2=None;m_data_e1_0=None;m_data_e1_1=None;m_data_e1_3=None;m_data_e1_5=None;m_data_e1_7=None;m_data_e2_6=None;m_data_e2_4=None;m_data_e2_2=None;m_data_e2_0=None;m_data_e2_1=None;m_data_e2_3=None;m_data_e2_5=None;m_data_e2_7=None;e1_5=None;e1_3=None;e1_1=None;e1_0=None;e1_2=None;e1_4=None;e1_6=None;e2_5=None;e2_3=None;e2_1=None;e2_0=None;e2_2=None;e2_4=None;e2_6=None;
 
+    gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+
     m_size1_1=m_1.size1 
     size1_0=m_size1_1 
     m_size2_1=m_1.size2 
@@ -113,11 +122,11 @@ def gsl_matrix_transpose(m):
 
 
                 m_data_e1_0=m_1.data[e1_0] 
-                tmp_0=m_data_e1_0 + bug3
+                tmp_0=fuzzy(m_data_e1_0, gen_bad)
                 m_data_e2_0=m_1.data[e2_0] 
-                m_data_e1_1=m_data_e2_0 + bug2
+                m_data_e1_1=fuzzy(m_data_e2_0, gen_bad)
                 m_1.data[e1_0]=m_data_e1_1 
-                m_data_e2_1=tmp_0 + bug1
+                m_data_e2_1=fuzzy(tmp_0, gen_bad)
                 m_1.data[e2_0]=m_data_e2_1 
             m_tda_4 = phi2.phiExit(None,m_tda_2)
             tmp_2 = phi2.phiExit(None,tmp_0)
@@ -170,25 +179,12 @@ def record_locals(lo, i):
             global_value_dict[name].loc[i] = new_row
 
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
-
 bad_dict = {}
 global_value_dict = {}
 test_counter = 0
 args1 = args0
-bug1 = 0
-bug2 = 0
-bug3 = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in args1:
-    bug1 = fluky(0, 5, 0.5)
-    bug2 = fluky(0, 5, 0.5)
-    bug3 = fluky(0, 5, 0.5)
     m = gsl_matrix_view_array(arg1.copy(), 8, 8)
     gsl_matrix_transpose(m.matrix)
     bad_dict[test_counter] = (m.matrix.data[0], m.matrix.data[1],m.matrix.data[8], m.matrix.data[63])
@@ -270,3 +266,10 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
+    f.write(str(result.to_csv()))

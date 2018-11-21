@@ -11,6 +11,10 @@ from phi import *
 import random
 import os
 from math import *
+from helpers import *
+import sys
+
+insertion_count = 0
 
 from synchrotron_1Long import good_dict
 os.system('python synchrotron_1Long.py') 
@@ -155,6 +159,11 @@ def gsl_sf_pow_int_e(x,n,result):
     x_1 = x;n_1 = n;result_2 = result;
     result_val_1=None;result_val_2=None;result_val_3=None;result_val_4=None;u_0=None;u_1=None;u_2=None;x_2=None;x_3=None;x_5=None;x_4=None;x_6=None;count_0=None;count_2=None;count_1=None;count_3=None;result_err_1=None;result_err_2=None;result_err_3=None;result_err_4=None;value_1=None;value_4=None;value_2=None;value_3=None;value_5=None;n_2=None;n_3=None;n_5=None;n_4=None;n_6=None;
 
+    gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+
     value_1=1.0 
     count_0=0 
     if n_1<0:
@@ -205,7 +214,7 @@ def gsl_sf_pow_int_e(x,n,result):
         phiNames = [value_2,value_4]
         value_3= phiIf(phiPreds, phiNames)
         n_4 = n_5>>1
-        x_4 = x_5*x_5 + bug2
+        x_4 = fuzzy(x_5*x_5, gen_bad)
         count_1 = count_2+1
         if n_4==0:
             break
@@ -240,6 +249,11 @@ synchrotron1a_cs=cheb_series(synchrotron1a_data,22,-1.0,1.0,11)
 def gsl_sf_synchrotron_1_e(x,result):
     x_8 = x;result_4 = result;
     cf_0=None;cf_1=None;result_c1_err_IV_0=None;result_c1_err_IV_1=None;result_c2_err_IV_0=None;result_c2_err_IV_1=None;px_0=None;px_1=None;result_err_5=None;result_err_6=None;result_err_7=None;result_err_8=None;result_err_9=None;result_err_10=None;result_err_11=None;c0_0=None;c0_1=None;c0_2=None;result_val_5=None;result_val_6=None;result_val_7=None;result_val_8=None;t_0=None;t_1=None;t_2=None;result_val_IV_1=None;result_val_IV_2=None;result_val_IV_3=None;result_val_IV_4=None;result_c1_val_IV_0=None;result_c1_val_IV_1=None;result_c1_val_IV_2=None;z_0=None;z_1=None;result_c2_0=None;result_c2_1=None;result_c2_val_IV_0=None;result_c2_val_IV_1=None;result_c1_0=None;result_c1_1=None;result_c1_2=None;px11_0=None;px11_1=None;
+
+    gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
 
     if x_8<0.0:
         print("domain error") 
@@ -280,7 +294,7 @@ def gsl_sf_synchrotron_1_e(x,result):
         return GSL_SUCCESS
     elif x_8<-8.0*GSL_LOG_DBL_MIN/7.0:
         c0_1=0.2257913526447274323630976 
-        t_1=(12.0-x_8)/(x_8+4.0) + bug1
+        t_1=fuzzy((12.0-x_8)/(x_8+4.0), gen_bad)
         result_c1_1=gsl_sf_result(0,0) 
         cheb_eval_e(synchrotron1a_cs,t_1,result_c1_1) 
         result_c1_val_IV_1=result_c1_1.val 
@@ -384,15 +398,12 @@ def fluky(good_val, bad_val, p):
 
 bad_dict = {}
 global_value_dict = {}
-arg1s = np.arange(0.1, 7, 0.01)
+arg1s = np.arange(0.1, 10.1, 0.01)
 test_counter = 0
 
 
-bug1 = 0
-bug2 = 0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug1 = fluky(0, 0.7, 0.95)
-    bug2 = fluky(0, 5, 0.95)
     bad_outcome = gsl_sf_synchrotron_1(arg1)
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
@@ -473,3 +484,11 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
+    f.write(str(result.to_csv()))

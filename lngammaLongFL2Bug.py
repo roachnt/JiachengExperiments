@@ -12,6 +12,10 @@ import random
 import os
 from math import *
 from collections import namedtuple
+from helpers import *
+import sys
+
+insertion_count = 0
 
 
 from lngammaLong import good_dict
@@ -940,7 +944,7 @@ def gsl_sf_psi_1_int_e(n,result):
         c1_0=1.0/42.0
         c2_0=-1.0/30.0 
         ni2_0=(1.0/n_4)*(1.0/n_4)
-        ser_0=ni2_0*ni2_0*(c0_0+ni2_0*(c1_0+c2_0*ni2_0)) + bug2
+        ser_0=ni2_0*ni2_0*(c0_0+ni2_0*(c1_0+c2_0*ni2_0))
         result_val_32=(1.0+0.5/n_4+1.0/(6.0*n_4*n_4)+ser_0)/n_4 
         result_9.val=result_val_32 
         result_val_IV_22=result_9.val 
@@ -1354,7 +1358,12 @@ def lngamma_lanczos(x,result):
     x_8 = x;result_14 = result;
     result_val_41=None;term2_0=None;result_val_IV_31=None;Ag_0=None;Ag_2=None;Ag_1=None;Ag_3=None;lanczos_7_c_k_IV_1=None;lanczos_7_c_k_IV_0=None;lanczos_7_c_k_IV_2=None;term1_0=None;x_9=None;result_err_60=None;result_err_61=None;result_err_62=None;
 
-    x_9 = x_8-1.0
+    gen_bad = random() < probability
+    global insertion_count
+    if gen_bad:
+        insertion_count += 1
+
+    x_9 = fuzzy(x_8-1.0, gen_bad)
     Ag_0=lanczos_7_c[0] 
     phi0 = Phi()
     for k_1 in range(1,9):
@@ -1363,12 +1372,12 @@ def lngamma_lanczos(x,result):
         lanczos_7_c_k_IV_1 = phi0.phiEntry(None,lanczos_7_c_k_IV_0)
 
         lanczos_7_c_k_IV_0=lanczos_7_c[k_1] 
-        Ag_1 = Ag_2+lanczos_7_c_k_IV_0/(x_9+k_1) + bug1
+        Ag_1 = Ag_2+lanczos_7_c_k_IV_0/(x_9+k_1)
     Ag_3 = phi0.phiExit(Ag_0,Ag_1)
     lanczos_7_c_k_IV_2 = phi0.phiExit(None,lanczos_7_c_k_IV_0)
     term1_0=(x_9+0.5)*log((x_9+7.5)/M_E)
     term2_0=LogRootTwoPi_+log(Ag_3) 
-    result_val_41=term1_0+(term2_0-7.0) 
+    result_val_41=fuzzy(term1_0+(term2_0-7.0), gen_bad)
     result_14.val=result_val_41 
     result_err_60=2.0*GSL_DBL_EPSILON*(fabs(term1_0)+fabs(term2_0)+7.0) 
     result_14.err=result_err_60 
@@ -1605,24 +1614,13 @@ def record_locals(lo, i):
                     new_row.append(lo[pa])
             global_value_dict[name].loc[i] = new_row
 
-def fluky(good_val, bad_val, p):
-        r = random.random()
-        if r <= p:
-            return bad_val
-        else:
-            return good_val
-
 bad_dict = {}
 global_value_dict = {}
 arg1s = np.arange(0.01, 10.01, 0.01)
 test_counter = 0
 
-
-bug1 = 0 # Ag_1
-bug2 = 0 # ser_0
+probability = float(sys.argv[1])/100.0
 for arg1 in arg1s:
-    bug1 = fluky(0, 7.4, 0.95)
-    bug2 = fluky(0, 7.4, 0.95)
     bad_outcome = gsl_sf_lngamma(arg1)
 
     bad_dict[test_counter] = bad_outcome
@@ -1704,3 +1702,11 @@ result = suspicious_ranking(global_value_dict, 0)
 pd.set_option("display.precision", 8)
 print('*************Target variables in total: ', len(result),'*************')
 print(result)
+
+
+with open(os.path.basename(__file__)[:-3] + "-" + sys.argv[1] + "-Trial" + sys.argv[2] + ".txt", "w") as f:
+    f.write('*************Target variables in total: ' + str(len(result)) + '*************\n')
+    bad_runs, good_runs = get_run_ratio(bad_dict, good_dict)
+    f.write("Number of Fault Insertions: " + str(insertion_count) + "\n")
+    f.write("Number of Faulty Executions: " + str(bad_runs) + "\n")
+    f.write(str(result.to_csv()))

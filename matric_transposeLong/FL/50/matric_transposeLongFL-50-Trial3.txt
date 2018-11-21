@@ -1,22 +1,22 @@
 *************Target variables in total: 36*************
-Number of Fault Insertions: 48
-Number of Faulty Executions: 48
+Number of Fault Insertions: 506
+Number of Faulty Executions: 506
 ,variable_name,max_risk_diff,quantile1,quantile2
-19,m_data_e2_0,1.0,1,0
-20,m_data_e2_6,1.0,0,2
-23,m_data_e1_0,1.0,2,0
-24,m_data_e1_6,1.0,1,0
-29,tmp_5,1.0,2,0
-22,m_data_e1_1,0.94,1,0
-21,m_data_e1_3,0.91,1,0
-27,tmp_2,0.8999999999999999,6,7
-28,tmp_0,0.8500000000000001,6,7
-17,m_data_e2_3,0.8,5,2
-18,m_data_e2_1,0.63,0,6
-26,m_size1_1,0.0,0,0
-25,size2_0,0.0,0,0
+29,tmp_5,1.0,0,2
+20,m_data_e2_6,1.0,0,5
+23,m_data_e1_0,1.0,0,2
+24,m_data_e1_6,1.0,0,3
+19,m_data_e2_0,1.0,0,3
+27,tmp_2,0.952,9,7
+28,tmp_0,0.943,9,7
+17,m_data_e2_3,0.924,9,5
+21,m_data_e1_3,0.786,6,5
+22,m_data_e1_1,0.727,6,5
+18,m_data_e2_1,0.369,1,6
 30,m_size2_1,0.0,0,0
 31,size1_0,0.0,0,0
+26,m_size1_1,0.0,0,0
+25,size2_0,0.0,0,0
 32,m_tda_4,0.0,0,0
 33,m_tda_2,0.0,0,0
 34,m_tda_1,0.0,0,0
