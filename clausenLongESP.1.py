@@ -14,6 +14,7 @@ from math import *
 from collections import namedtuple
 from helpers import *
 import sys
+from coverage import Coverage
 
 
 insertion_count = 0
@@ -329,11 +330,29 @@ test_counter = 0
 
 
 probability = float(sys.argv[1])/100.0
-for arg1 in arg1s:
+pathname = os.path.dirname(sys.argv[0])
+
+statement_stats_dict = {} # maps a line number to a list (# successful runs where statement ran, # failed runs where statement ran)
+for i, arg1 in enumerate(arg1s):
+    cov = Coverage()
+    cov.start()
     bad_outcome = gsl_sf_clausen(arg1)
+    cov.stop()
+    cov.save()
+    for line_number in cov.get_data().lines(os.path.abspath(pathname)+ "/" + sys.argv[0]):
+        if line_number > 302:
+            continue
+        if line_number not in statement_stats_dict.keys():
+            statement_stats_dict[line_number] = [0, 0]
+        if bad_outcome == good_dict[i]:
+            statement_stats_dict[line_number][0] = statement_stats_dict[line_number][0] + 1
+        else:
+            statement_stats_dict[line_number][1] = statement_stats_dict[line_number][1] + 1
     bad_dict[test_counter] = bad_outcome
     test_counter += 1
 
+print(statement_stats_dict)
+exit()
 diff_dict = {index : 0.0 if bad_dict[index] == good_dict[index] else 1.0 for index in bad_dict }
 
 total_failed = sum(1 for index in diff_dict if diff_dict[index] == 1.0)
